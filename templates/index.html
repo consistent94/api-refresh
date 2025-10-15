@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Search Historical Figures - Historical Figures Explorer{% endblock %}
+
+{% block content %}
+<div class="search-section">
+    <div class="search-header">
+        <h2>Discover Historical Figures</h2>
+        <p>Search for biographical information about historical figures from around the world.</p>
+    </div>
+
+    <form class="search-form" method="POST" action="{{ url_for('search') }}">
+        <div class="search-input-group">
+            <input 
+                type="text" 
+                name="name" 
+                class="search-input" 
+                placeholder="Enter a historical figure's name (e.g., Leonardo da Vinci, Cleopatra, Albert Einstein)"
+                required
+                autocomplete="off"
+            >
+            <button type="submit" class="search-button">
+                <span>🔍</span>
+                Search
+            </button>
+        </div>
+    </form>
+
+    <div class="search-suggestions">
+        <h3>Popular Searches</h3>
+        <div class="suggestion-tags">
+            <a href="{{ url_for('search') }}" class="suggestion-tag" onclick="fillSearch('Leonardo da Vinci')">Leonardo da Vinci</a>
+            <a href="{{ url_for('search') }}" class="suggestion-tag" onclick="fillSearch('Cleopatra')">Cleopatra</a>
+            <a href="{{ url_for('search') }}" class="suggestion-tag" onclick="fillSearch('Albert Einstein')">Albert Einstein</a>
+            <a href="{{ url_for('search') }}" class="suggestion-tag" onclick="fillSearch('Marie Curie')">Marie Curie</a>
+            <a href="{{ url_for('search') }}" class="suggestion-tag" onclick="fillSearch('Napoleon Bonaparte')">Napoleon Bonaparte</a>
+            <a href="{{ url_for('search') }}" class="suggestion-tag" onclick="fillSearch('William Shakespeare')">William Shakespeare</a>
+            <a href="{{ url_for('search') }}" class="suggestion-tag" onclick="fillSearch('Joan of Arc')">Joan of Arc</a>
+            <a href="{{ url_for('search') }}" class="suggestion-tag" onclick="fillSearch('Galileo Galilei')">Galileo Galilei</a>
+        </div>
+    </div>
+
+    <div class="features">
+        <h3>What You'll Find</h3>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📅</div>
+                <h4>Life Timeline</h4>
+                <p>Birth and death dates with historical context</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏛️</div>
+                <h4>Biographical Details</h4>
+                <p>Comprehensive summaries and key achievements</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h4>Geographic Context</h4>
+                <p>Birth and death locations with coordinates</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👤</div>
+                <h4>Professional Info</h4>
+                <p>Occupation, nationality, and historical categories</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function fillSearch(name) {
+        event.preventDefault();
+        document.querySelector('.search-input').value = name;
+        document.querySelector('.search-form').submit();
+    }
+    
+    // Add some interactivity to search suggestions
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('.search-input');
+        const suggestionTags = document.querySelectorAll('.suggestion-tag');
+        
+        // Add hover effects
+        suggestionTags.forEach(tag => {
+            tag.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            });
+            
+            tag.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+            });
+        });
+        
+        // Focus search input on page load
+        searchInput.focus();
+    });
+</script>
+{% endblock %}
+

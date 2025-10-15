@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}{{ figure.name }} - Historical Figures Explorer{% endblock %}
+
+{% block content %}
+<div class="figure-container">
+    <!-- Header Section -->
+    <div class="figure-header">
+        <div class="figure-image">
+            {% if figure.image_url %}
+                <img src="{{ figure.image_url }}" alt="{{ figure.name }}" class="figure-img">
+            {% else %}
+                <div class="figure-placeholder">
+                    <span class="placeholder-icon">👤</span>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="figure-info">
+            <h1 class="figure-name">{{ figure.name }}</h1>
+            
+            {% if figure.description %}
+                <p class="figure-description">{{ figure.description }}</p>
+            {% endif %}
+            
+            <div class="figure-meta">
+                {% if figure.historical_period %}
+                    <span class="meta-badge period">{{ figure.historical_period }}</span>
+                {% endif %}
+                
+                {% if figure.categories %}
+                    {% for category in figure.categories %}
+                        <span class="meta-badge category">{{ category }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Life Information -->
+    <div class="figure-section">
+        <h2>📅 Life Information</h2>
+        <div class="life-info-grid">
+            <div class="life-info-item">
+                <h3>Birth</h3>
+                {% if figure.birth_date %}
+                    <p class="date-info">
+                        {% if figure.birth_date.formatted %}
+                            <strong>{{ figure.birth_date.formatted }}</strong>
+                        {% endif %}
+                        {% if figure.birth_place %}
+                            <br><span class="location">📍 {{ figure.birth_place }}</span>
+                        {% endif %}
+                    </p>
+                {% else %}
+                    <p class="no-info">Birth information not available</p>
+                {% endif %}
+            </div>
+            
+            <div class="life-info-item">
+                <h3>Death</h3>
+                {% if figure.death_date %}
+                    <p class="date-info">
+                        {% if figure.death_date.formatted %}
+                            <strong>{{ figure.death_date.formatted }}</strong>
+                        {% endif %}
+                        {% if figure.death_place %}
+                            <br><span class="location">📍 {{ figure.death_place }}</span>
+                        {% endif %}
+                        {% if figure.age %}
+                            <br><span class="age">Age: {{ figure.age }} years</span>
+                        {% endif %}
+                    </p>
+                {% else %}
+                    <p class="no-info">Death information not available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Professional Information -->
+    {% if figure.occupation or figure.nationality %}
+    <div class="figure-section">
+        <h2>👤 Professional Information</h2>
+        <div class="professional-info">
+            {% if figure.occupation %}
+                <div class="info-item">
+                    <h3>Occupation</h3>
+                    <p>{{ figure.occupation }}</p>
+                </div>
+            {% endif %}
+            
+            {% if figure.nationality %}
+                <div class="info-item">
+                    <h3>Nationality</h3>
+                    <p>{{ figure.nationality }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Biography -->
+    {% if figure.summary %}
+    <div class="figure-section">
+        <h2>📖 Biography</h2>
+        <div class="biography">
+            <p>{{ figure.summary }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Geographic Information -->
+    {% if figure.coordinates %}
+    <div class="figure-section">
+        <h2>🌍 Geographic Information</h2>
+        <div class="coordinates">
+            {% if figure.coordinates.lat and figure.coordinates.lon %}
+                <p>Coordinates: {{ figure.coordinates.lat }}, {{ figure.coordinates.lon }}</p>
+                <a href="https://www.google.com/maps?q={{ figure.coordinates.lat }},{{ figure.coordinates.lon }}" 
+                   target="_blank" class="map-link">
+                    View on Google Maps
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- External Links -->
+    <div class="figure-section">
+        <h2>🔗 External Links</h2>
+        <div class="external-links">
+            {% if figure.wikipedia_url %}
+                <a href="{{ figure.wikipedia_url }}" target="_blank" class="external-link wikipedia">
+                    📚 Wikipedia Article
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Data Quality Information -->
+    {% if figure.validation %}
+    <div class="figure-section data-quality">
+        <h2>ℹ️ Data Quality</h2>
+        <div class="validation-info">
+            {% if figure.validation.warnings %}
+                <div class="warnings">
+                    <h4>⚠️ Warnings</h4>
+                    <ul>
+                        {% for warning in figure.validation.warnings %}
+                            <li>{{ warning }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <p class="last-updated">
+                Last updated: {{ figure.last_updated[:19].replace('T', ' ') }} UTC
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back to Search -->
+    <div class="figure-actions">
+        <a href="{{ url_for('index') }}" class="back-button">
+            ← Back to Search
+        </a>
+    </div>
+</div>
+
+<script>
+    // Add some interactivity
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add hover effects to external links
+        const externalLinks = document.querySelectorAll('.external-link');
+        externalLinks.forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+            });
+            
+            link.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+        
+        // Add click effect to meta badges
+        const metaBadges = document.querySelectorAll('.meta-badge');
+        metaBadges.forEach(badge => {
+            badge.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    });
+</script>
+{% endblock %}
+

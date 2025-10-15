@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Historical Figures Explorer{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">
+                <a href="{{ url_for('index') }}">🏛️ Historical Figures Explorer</a>
+            </h1>
+            <nav class="nav">
+                <a href="{{ url_for('index') }}" class="nav-link">Search</a>
+                <a href="#" class="nav-link" onclick="showAbout()">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash flash-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Historical Figures Explorer. Data from <a href="https://www.wikipedia.org/" target="_blank">Wikipedia</a>.</p>
+            <p>Built with Python, Flask, and ❤️ for learning data engineering.</p>
+        </div>
+    </footer>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="hideAbout()">&times;</span>
+            <h2>About Historical Figures Explorer</h2>
+            <p>This application demonstrates API data extraction and ETL (Extract, Transform, Load) processes using:</p>
+            <ul>
+                <li><strong>Extract:</strong> Wikipedia REST API for biographical data</li>
+                <li><strong>Transform:</strong> Data cleaning and structuring with Python</li>
+                <li><strong>Load:</strong> Flask web interface for data display</li>
+            </ul>
+            <p>Perfect for learning Python, API integration, and data engineering fundamentals!</p>
+        </div>
+    </div>
+
+    <script>
+        function showAbout() {
+            document.getElementById('aboutModal').style.display = 'block';
+        }
+        
+        function hideAbout() {
+            document.getElementById('aboutModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('aboutModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+
