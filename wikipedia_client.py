@@ -7,6 +7,7 @@ biographical data about historical figures.
 
 import requests
 import time
+from urllib.parse import quote
 from typing import Dict, List, Optional
 
 
@@ -80,8 +81,11 @@ class WikipediaClient:
             Dict: Page content including summary, infobox, and metadata
         """
         try:
+            # URL encode the title to handle spaces and special characters
+            encoded_title = quote(title, safe='')
+            
             # Get page summary
-            summary_url = f"{self.base_url}/page/summary/{title}"
+            summary_url = f"{self.base_url}/page/summary/{encoded_title}"
             summary_response = self.session.get(summary_url, timeout=10)
             
             if summary_response.status_code != 200:
@@ -90,7 +94,7 @@ class WikipediaClient:
             summary_data = summary_response.json()
             
             # Get full page content for infobox extraction
-            content_url = f"{self.base_url}/page/html/{title}"
+            content_url = f"{self.base_url}/page/html/{encoded_title}"
             content_response = self.session.get(content_url, timeout=10)
             
             # Rate limiting - be respectful to Wikipedia's servers

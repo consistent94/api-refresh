@@ -8,7 +8,7 @@ extracted from Wikipedia.
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import os
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 from wikipedia_client import WikipediaClient
 from data_transformer import DataTransformer
@@ -62,9 +62,8 @@ def search():
         # Validate the data
         validated_data = data_transformer.validate_data(transformed_data)
         
-        # Redirect to figure page
-        figure_name = quote(transformed_data['name'])
-        return redirect(url_for('figure', name=figure_name))
+        # Redirect to figure page - Flask will handle URL encoding automatically
+        return redirect(url_for('figure', name=transformed_data['name']))
         
     except Exception as e:
         app.logger.error(f"Error searching for {name}: {str(e)}")
@@ -84,8 +83,8 @@ def figure(name):
         Rendered template with figure details or 404
     """
     try:
-        # Decode the name
-        decoded_name = name.replace('_', ' ')
+        # Decode the name - handle URL encoding properly
+        decoded_name = unquote(name)
         
         # Get data from Wikipedia (in case user accessed URL directly)
         raw_data = wikipedia_client.get_figure_data(decoded_name)
@@ -112,13 +111,15 @@ def api_search(name):
     API endpoint for searching historical figures.
     
     Args:
-        name (str): Name to search for
+        name (str): URL-encoded name to search for
         
     Returns:
         JSON response with figure data
     """
     try:
-        raw_data = wikipedia_client.get_figure_data(name)
+        # Decode the name from URL
+        decoded_name = unquote(name)
+        raw_data = wikipedia_client.get_figure_data(decoded_name)
         
         if not raw_data:
             return jsonify({'error': 'No information found'}), 404
@@ -129,7 +130,7 @@ def api_search(name):
         return jsonify(validated_data)
         
     except Exception as e:
-        app.logger.error(f"API error for {name}: {str(e)}")
+        app.logger.error(f"API error for {decoded_name}: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500
 
 
@@ -139,22 +140,25 @@ def api_suggestions(query):
     API endpoint for search suggestions.
     
     Args:
-        query (str): Partial search query
+        query (str): URL-encoded partial search query
         
     Returns:
         JSON response with search suggestions
     """
     try:
-        if len(query) < 2:
+        # Decode the query from URL
+        decoded_query = unquote(query)
+        
+        if len(decoded_query) < 2:
             return jsonify({'suggestions': []})
         
-        search_results = wikipedia_client.search_figure(query, limit=5)
+        search_results = wikipedia_client.search_figure(decoded_query, limit=5)
         suggestions = [result['title'] for result in search_results]
         
         return jsonify({'suggestions': suggestions})
         
     except Exception as e:
-        app.logger.error(f"Suggestions error for {query}: {str(e)}")
+        app.logger.error(f"Suggestions error for {decoded_query}: {str(e)}")
         return jsonify({'suggestions': []})
 
 
@@ -174,7 +178,7 @@ def internal_error(error):
 if __name__ == '__main__':
     # Development server configuration
     debug_mode = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5001))
     
     print("Historical Figures Explorer")
     print("=" * 40)
